@@ -5,7 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:   # allow manual trigger
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,7 +16,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache Buildozer global directory (SDK/NDK)
+      # Cache the entire Buildozer directory (includes SDK/NDK)
+      - name: Cache Buildozer
         uses: actions/cache@v4
         with:
           path: ~/.buildozer
@@ -44,19 +45,33 @@ jobs:
           pip install --upgrade pip
           pip install cython buildozer
 
-      - name: Configure buildozer spec (optional)
-        # Your existing buildozer.spec is already in the repo.
-        # If you need to tweak it dynamically, do it here.
+      - name: Create buildozer.spec
         run: |
-          # Example: adjust Android API level
-          # sed -i 's/android.api = 30/android.api = 33/' buildozer.spec
-          cat buildozer.spec   # show spec for debugging
+          cat > buildozer.spec << 'EOF'
+          [app]
+          title = Snake Legends
+          package.name = snakelegends
+          package.domain = org.snakelegends
+          source.dir = .
+          source.include_exts = py,png,jpg,kv,atlas,txt
+          version = 0.1
+          requirements = python3,kivy,kivymd,random,math
+          orientation = portrait
+          fullscreen = 1
+          android.permissions = INTERNET
+          android.api = 30
+          android.minapi = 21
+          android.sdk = 30
+          android.ndk = 25c
+          android.accept_sdk_license = True
+          android.build_tools = 30.0.3
+          android.arch = armeabi-v7a
+          android.allow_backup = True
+          ios.codesign.debug = False
+          EOF
 
       - name: Build APK
-        run: |
-          # Buildozer will download SDK/NDK only if not cached.
-          # The spec already contains android.accept_sdk_license = True
-          buildozer -v android debug
+        run: buildozer -v android debug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
