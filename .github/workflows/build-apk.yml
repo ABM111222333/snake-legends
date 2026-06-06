@@ -21,7 +21,7 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.33
 
-    - name: Create buildozer.spec (clean version)
+    - name: Create buildozer.spec (with NDK 25c)
       run: |
         cat > buildozer.spec << 'EOF'
         [app]
@@ -38,7 +38,7 @@ jobs:
         android.api = 30
         android.minapi = 21
         android.sdk = 30
-        android.ndk = 23b
+        android.ndk = 25c
         android.accept_sdk_license = True
         android.arch = armeabi-v7a
         android.allow_backup = True
