@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04   # Use Ubuntu 22.04 (not deprecated)
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.33
 
-    - name: Create buildozer.spec (NDK 23b, API 30)
+    - name: Create buildozer.spec (NDK 25c, API 30)
       run: |
         cat > buildozer.spec << 'EOF'
         [app]
@@ -39,7 +39,7 @@ jobs:
         android.api = 30
         android.minapi = 21
         android.sdk = 30
-        android.ndk = 23b
+        android.ndk = 25c
         android.accept_sdk_license = True
         android.build_tools = 30.0.3
         android.arch = armeabi-v7a
@@ -49,8 +49,8 @@ jobs:
 
     - name: Accept Android SDK licenses
       run: |
-        # Wait for SDK to be downloaded by Buildozer, then accept licenses
-        sleep 10
+        # Wait for SDK to be downloaded (Buildozer does it)
+        sleep 20
         yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
 
     - name: Build APK
