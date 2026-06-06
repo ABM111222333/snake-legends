@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04   # Use older Ubuntu to avoid autotools issues
+    runs-on: ubuntu-22.04   # Use Ubuntu 22.04 (not deprecated)
 
     steps:
     - uses: actions/checkout@v4
@@ -49,7 +49,8 @@ jobs:
 
     - name: Accept Android SDK licenses
       run: |
-        # The SDK is downloaded by Buildozer, we accept all licenses
+        # Wait for SDK to be downloaded by Buildozer, then accept licenses
+        sleep 10
         yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
 
     - name: Build APK
