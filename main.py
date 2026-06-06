@@ -146,14 +146,14 @@ class IntroScreen:
                 self.screen.blit(glow_surface,
                                  (center_x - glow_size // 2, center_y - glow_size // 2))
 
-            logo_font = pygame.font.Font("font.ttf", int(80 * self.logo_scale))
+            logo_font = pygame.font.SysFont("Arial", int(80 * self.logo_scale))
             logo_text = logo_font.render("DEEPSEEK", True, DEEPSEEK_BLUE)
             rotated_logo = pygame.transform.rotate(logo_text, self.logo_rotation)
             logo_rect = rotated_logo.get_rect(center=(center_x, center_y))
             self.screen.blit(rotated_logo, logo_rect)
 
             if self.logo_scale > 0.8:
-                subtitle_font = pygame.font.Font("font.ttf", int(30 * self.logo_scale))
+                subtitle_font = pygame.font.SysFont("Arial", int(30 * self.logo_scale))
                 subtitle_text = subtitle_font.render("AI-POWERED GAMING", True, TEXT_WHITE)
                 subtitle_rect = subtitle_text.get_rect(center=(center_x, center_y + 60))
                 self.screen.blit(subtitle_text, subtitle_rect)
@@ -175,7 +175,7 @@ class IntroScreen:
                 pygame.draw.line(self.screen, color, (bar_x + i, bar_y), (bar_x + i, bar_y + bar_height))
 
             dot_text = "." * (self.loading_dots % 4)
-            loading_font = pygame.font.Font("font.ttf", 24)
+            loading_font = pygame.font.SysFont("Arial", 24)
             loading_text = loading_font.render(f"LOADING{dot_text}", True, TEXT_WHITE)
             loading_rect = loading_text.get_rect(center=(WINDOW_WIDTH // 2, bar_y + 25))
             self.screen.blit(loading_text, loading_rect)
@@ -255,7 +255,7 @@ class PremiumButton:
         screen.blit(text_surface, text_rect)
 
         if self.icon:
-            icon_font = pygame.font.Font("font.ttf", 32)
+            icon_font = pygame.font.SysFont("Arial", 32)
             icon_text = icon_font.render(self.icon, True, TEXT_WHITE)
             icon_rect = icon_text.get_rect(midright=(self.rect.x + 20, self.rect.centery))
             screen.blit(icon_text, icon_rect)
@@ -329,7 +329,7 @@ class ModernStartMenu:
         self.draw_background_snakes()
         self.particles.draw(self.screen)
 
-        title_font = pygame.font.Font("font.ttf", 100)
+        title_font = pygame.font.SysFont("Arial", 100)
         title_shadow = title_font.render("SNAKE LEGENDS", True, (0, 0, 0))
         title_text = title_font.render("SNAKE LEGENDS", True, TEXT_GOLD)
 
@@ -342,7 +342,7 @@ class ModernStartMenu:
 
         self.screen.blit(title_text, title_rect)
 
-        subtitle_font = pygame.font.Font("font.ttf", 36)
+        subtitle_font = pygame.font.SysFont("Arial", 36)
         subtitle_text = subtitle_font.render("360° MOVEMENT | PREMIUM SNAKE GAME", True, TEXT_WHITE)
         subtitle_rect = subtitle_text.get_rect(center=(WINDOW_WIDTH // 2, 210))
 
@@ -378,25 +378,25 @@ class ModernStartMenu:
             pygame.draw.rect(self.screen, (TEXT_GOLD[0], TEXT_GOLD[1], TEXT_GOLD[2], 100),
                              (x, y, card_width, card_height), 2, border_radius=10)
 
-            icon_font = pygame.font.Font("font.ttf", 40)
+            icon_font = pygame.font.SysFont("Arial", 40)
             icon_text = icon_font.render(icon, True, TEXT_GOLD)
             icon_rect = icon_text.get_rect(center=(x + card_width // 2, y + 30))
             self.screen.blit(icon_text, icon_rect)
 
-            title_font_small = pygame.font.Font("font.ttf", 18)
+            title_font_small = pygame.font.SysFont("Arial", 18)
             title_surface = title_font_small.render(title, True, TEXT_WHITE)
             title_rect = title_surface.get_rect(center=(x + card_width // 2, y + 60))
             self.screen.blit(title_surface, title_rect)
 
-            desc_font = pygame.font.Font("font.ttf", 14)
+            desc_font = pygame.font.SysFont("Arial", 14)
             desc_surface = desc_font.render(desc, True, (150, 150, 150))
             desc_rect = desc_surface.get_rect(center=(x + card_width // 2, y + 80))
             self.screen.blit(desc_surface, desc_rect)
 
-        self.start_button.draw(self.screen, pygame.font.Font("font.ttf", 28))
-        self.quit_button.draw(self.screen, pygame.font.Font("font.ttf", 28))
+        self.start_button.draw(self.screen, pygame.font.SysFont("Arial", 28))
+        self.quit_button.draw(self.screen, pygame.font.SysFont("Arial", 28))
 
-        footer_font = pygame.font.Font("font.ttf", 16)
+        footer_font = pygame.font.SysFont("Arial", 16)
         footer_text = footer_font.render("MADE WITH DEEPSEEK AI - PREMIUM GAMING EXPERIENCE", True, (100, 100, 120))
         footer_rect = footer_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 30))
         self.screen.blit(footer_text, footer_rect)
@@ -711,10 +711,10 @@ class AnimatedApple:
 
 class GameUI:
     def __init__(self):
-        self.font_large = pygame.font.Font("font.ttf", 80)
-        self.font_medium = pygame.font.Font("font.ttf", 48)
-        self.font_small = pygame.font.Font("font.ttf", 32)
-        self.font_tiny = pygame.font.Font("font.ttf", 24)
+        self.font_large = pygame.font.SysFont("Arial", 80)
+        self.font_medium = pygame.font.SysFont("Arial", 48)
+        self.font_small = pygame.font.SysFont("Arial", 32)
+        self.font_tiny = pygame.font.SysFont("Arial", 24)
         self.score_animation = 0
         self.combo = 0
         self.combo_timer = 0
@@ -733,12 +733,11 @@ class GameUI:
         self.combo_timer = 60
 
     def draw_score(self, screen, score, high_score):
-        score_bg = pygame.Rect(10, 10, 150, 60)
-        pygame.draw.rect(screen, (0, 0, 0, 100), score_bg, border_radius=10)
-
         score_text = self.font_large.render(str(score), True, TEXT_GOLD)
-        score_rect = score_text.get_rect(topleft=(20, 10))
-        screen.blit(score_text, score_rect)
+        score_width = score_text.get_width() + 40
+        bg_rect = pygame.Rect(10, 10, max(150, score_width), 60)
+        pygame.draw.rect(screen, (0, 0, 0, 100), bg_rect, border_radius=10)
+        screen.blit(score_text, (20, 10))
 
         label = self.font_tiny.render("SCORE", True, TEXT_WHITE)
         screen.blit(label, (25, 65))
@@ -837,7 +836,7 @@ class ModernSnakeGame:
             overlay.set_alpha(180)
             overlay.fill(DARK_BG)
             self.screen.blit(overlay, (0, 0))
-            pause_font = pygame.font.Font("font.ttf", 80)
+            pause_font = pygame.font.SysFont("Arial", 80)
             pause_text = pause_font.render("PAUSED", True, TEXT_GOLD)
             pause_rect = pause_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
             self.screen.blit(pause_text, pause_rect)
