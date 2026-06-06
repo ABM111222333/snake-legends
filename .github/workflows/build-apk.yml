@@ -16,35 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Cache the entire Buildozer directory (includes SDK/NDK)
-      - name: Cache Buildozer
-        uses: actions/cache@v4
-        with:
-          path: ~/.buildozer
-          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
-          restore-keys: |
-            ${{ runner.os }}-buildozer-
-
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y git zip unzip openjdk-17-jdk \
-            autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
-            libncursesw5-dev cmake libffi-dev libssl-dev
-
-      - name: Install Python dependencies
-        run: |
-          pip install --upgrade pip
-          pip install cython buildozer
-
+      # 1. Create the buildozer.spec file
       - name: Create buildozer.spec
         run: |
           cat > buildozer.spec << 'EOF'
@@ -64,15 +36,46 @@ jobs:
           android.sdk = 30
           android.ndk = 25c
           android.accept_sdk_license = True
-          android.build_tools = 30.0.3
           android.arch = armeabi-v7a
           android.allow_backup = True
           ios.codesign.debug = False
           EOF
 
+      # 2. Install system dependencies
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk \
+            autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
+            libncursesw5-dev cmake libffi-dev libssl-dev
+
+      # 3. Configure caching
+      - name: Cache Buildozer global directory (SDK/NDK)
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            buildozer-global-
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # 4. Install and build
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install cython buildozer
+
       - name: Build APK
         run: buildozer -v android debug
 
+      # 5. Upload the result
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
