@@ -22,7 +22,7 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.33
 
-    - name: Create buildozer.spec (NDK 25c, API 30)
+    - name: Create buildozer.spec (NDK 25c, API 30, fixed requirements)
       run: |
         cat > buildozer.spec << 'EOF'
         [app]
@@ -32,7 +32,7 @@ jobs:
         source.dir = .
         source.include_exts = py,png,jpg,kv,atlas,txt
         version = 0.1
-        requirements = python3,kivy,kivymd,random,math,collections
+        requirements = python3,kivy,kivymd,random,math
         orientation = portrait
         fullscreen = 1
         android.permissions = INTERNET
@@ -49,8 +49,7 @@ jobs:
 
     - name: Accept Android SDK licenses
       run: |
-        # Wait for SDK to be downloaded (Buildozer does it)
-        sleep 20
+        sleep 30
         yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
 
     - name: Build APK
