@@ -7,7 +7,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04   # Use older Ubuntu to avoid autotools issues
+
     steps:
     - uses: actions/checkout@v4
 
@@ -21,9 +22,8 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.33
 
-    - name: Create buildozer.spec
+    - name: Create buildozer.spec (NDK 23b, API 30)
       run: |
-        buildozer init
         cat > buildozer.spec << 'EOF'
         [app]
         title = Snake Legends
@@ -39,7 +39,7 @@ jobs:
         android.api = 30
         android.minapi = 21
         android.sdk = 30
-        android.ndk = 25c
+        android.ndk = 23b
         android.accept_sdk_license = True
         android.build_tools = 30.0.3
         android.arch = armeabi-v7a
