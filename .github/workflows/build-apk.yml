@@ -1,63 +1,65 @@
-name: Build APK
+name: Build Android APK with Buildozer
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:   # allow manual trigger
 
 jobs:
   build:
     runs-on: ubuntu-22.04
+    timeout-minutes: 90
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
+      - name: Cache Buildozer global directory (SDK/NDK)
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-
 
-    - name: Install Buildozer and Cython
-      run: |
-        pip install --upgrade pip
-        pip install buildozer cython==0.29.33
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-    - name: Create buildozer.spec (NDK 25c, API 30, fixed requirements)
-      run: |
-        cat > buildozer.spec << 'EOF'
-        [app]
-        title = Snake Legends
-        package.name = snakelegends
-        package.domain = org.snakelegends
-        source.dir = .
-        source.include_exts = py,png,jpg,kv,atlas,txt
-        version = 0.1
-        requirements = python3,kivy,kivymd,random,math
-        orientation = portrait
-        fullscreen = 1
-        android.permissions = INTERNET
-        android.api = 30
-        android.minapi = 21
-        android.sdk = 30
-        android.ndk = 25c
-        android.accept_sdk_license = True
-        android.build_tools = 30.0.3
-        android.arch = armeabi-v7a
-        android.allow_backup = True
-        ios.codesign.debug = False
-        EOF
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk \
+            autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
+            libncursesw5-dev cmake libffi-dev libssl-dev
 
-    - name: Accept Android SDK licenses
-      run: |
-        sleep 30
-        yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install cython buildozer
 
-    - name: Build APK
-      run: |
-        buildozer -v android debug
+      - name: Configure buildozer spec (optional)
+        # Your existing buildozer.spec is already in the repo.
+        # If you need to tweak it dynamically, do it here.
+        run: |
+          # Example: adjust Android API level
+          # sed -i 's/android.api = 30/android.api = 33/' buildozer.spec
+          cat buildozer.spec   # show spec for debugging
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: snake-legends-apk
-        path: bin/*.apk
+      - name: Build APK
+        run: |
+          # Buildozer will download SDK/NDK only if not cached.
+          # The spec already contains android.accept_sdk_license = True
+          buildozer -v android debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-legends-apk
+          path: bin/*.apk
